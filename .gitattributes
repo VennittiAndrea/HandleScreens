@@ -1,0 +1,3 @@
+# Keep LF everywhere: the bash wrapper breaks with CRLF, and Windows
+# PowerShell 5.1 reads LF scripts fine.
+* text=auto eol=lf

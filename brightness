@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# WSL front end for brightness.ps1. WSL has no access to the GPU's I2C buses,
+# so DDC/CI only works from Windows: hand the arguments to Windows PowerShell.
+
+set -uo pipefail
+
+script_dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+ps_script="$(wslpath -w "${script_dir}/brightness.ps1")" || exit 1
+
+# Bypass applies to this one process only: the script sits on the WSL share,
+# which the machine's RemoteSigned policy would otherwise treat as remote.
+# Windows tools end lines with CRLF; strip the CR on both streams.
+powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass \
+  -File "${ps_script}" "$@" \
+  2> >(tr -d '\r' >&2) | tr -d '\r'
+exit "${PIPESTATUS[0]}"
